@@ -15,6 +15,7 @@ public class Visuel extends Observable {
     private double elasticity = 0;
     private int rows = 5, cols = 5;
     private volatile boolean goOn = false;
+    private volatile boolean pause = false;
     private int nbNeuronesDep = 2;
     private int nb_epochs = 10000;
     private double voisinage = 0.1;
@@ -23,6 +24,21 @@ public class Visuel extends Observable {
     private boolean apprentissage_const = false;
     // ------------------------------ FIN OPTIONS -------------------------------------
 
+    public boolean getPause(){
+    	return pause;
+    }
+    
+    public void setPause(boolean p){
+    	
+    	pause = p;
+    	synchronized (this) {
+    		notify();
+		}
+    	
+    	setChanged();
+    	notifyObservers();
+    }
+    
     public boolean getApprentissageCst(){
     	return apprentissage_const;
     }

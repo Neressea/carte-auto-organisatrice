@@ -96,6 +96,18 @@ public class SOM extends NeuralNetwork {
     				//Si on arrête l'algo, on sort de la boucle
     				if(!visuel.getGoOn()) break;
     				
+    				synchronized (visuel) {
+    					while(visuel.getPause()){
+    						try {
+    							visuel.wait();
+    						} catch (InterruptedException e1) {
+
+    							e1.printStackTrace();
+    						}
+        				}
+					}
+    				
+    				
     			    // Mise a jour des voisinages et tx apprentissage
     			    t = ((continu * epochs)+exemples) / (float)(totalEpochs * epochs);
     		            //lrate = lrate_i*Math.pow((lrate_f/lrate_i), t);

@@ -60,13 +60,14 @@ public class MapInterface extends JFrame implements Observer {
     private JMenuItem       nInit = null;  
     
     //Graphical objects for options
+    private JButton btn_stop_algo = null;
+    private JButton btn_clear = null;
+    private JButton btn_pause = null;
     private JDialog 	options = null;
     	private JSlider	slider_epochs = null;
 	    private JSlider slider_elastic = null;
 	    private JSlider grid_width = null;
 	    private JSlider grid_height = null;
-	    private JButton btn_stop_algo = null;
-	    private JButton btn_clear = null;
 	    private JSlider slider_nb_dep = null;
 	    private JCheckBox choice_learning = null;
 	    private JCheckBox choice_neighbor = null;
@@ -135,9 +136,35 @@ public class MapInterface extends JFrame implements Observer {
 		    jJMenuBar.add(getnMenu()); // networks
 		    jJMenuBar.add(getJOptionsButton());
 		    jJMenuBar.add(getJClearButton());
+		    jJMenuBar.add(getJPauseButton());
 		    jJMenuBar.add(getJStopButton());
 		}
 		return jJMenuBar;
+    }
+    
+    public JButton getJPauseButton(){
+    	if(btn_pause == null){
+    		btn_pause = new JButton("pause");
+    		btn_pause.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					//On inverse la pause
+					nw.setPause(!nw.getPause());
+					
+					//On change l'affichage du bouton
+					if(nw.getPause())		
+						btn_pause.setText("Reprendre");
+					else
+						btn_pause.setText("Pause");
+				}
+			});
+    		
+    		btn_pause.setEnabled(false);
+    	}
+    
+    	
+    	return btn_pause;
     }
     
     /**
@@ -783,12 +810,15 @@ public class MapInterface extends JFrame implements Observer {
     	
     	//On vérifie si un algo a été lancé
     	if(nw.getGoOn()){
+    		
     		//Dans ce cas on désactive les options
     		jOptions.setEnabled(false);
     		jMenu.setEnabled(false);
     		nMenu.setEnabled(false);
     		btn_clear.setEnabled(false);
     		btn_stop_algo.setEnabled(true);
+    		btn_pause.setEnabled(true);
+    		
     	}else{
     		//Autrement on les réactive toutes
     		jOptions.setEnabled(true);
@@ -796,6 +826,7 @@ public class MapInterface extends JFrame implements Observer {
     		nMenu.setEnabled(true);
     		btn_clear.setEnabled(true);
     		btn_stop_algo.setEnabled(false);
+    		btn_pause.setEnabled(false);
     		
     		gngInitialize = false;
     		somInitialize = false;

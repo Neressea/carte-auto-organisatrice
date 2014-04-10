@@ -91,6 +91,19 @@ public class GNG extends NeuralNetwork {
 	    			*/
 	    		
 	    			while (( neurones.size() < creation) && (exemples < epochs) && visuel.getGoOn())  {
+	    				
+	    				//On regarde si lka pause a été mise
+	    				synchronized (visuel) {
+	    					while(visuel.getPause()){
+	    						try {
+	    							visuel.wait();
+	    						} catch (InterruptedException e1) {
+	    							// TODO Auto-generated catch block
+	    							e1.printStackTrace();
+	    						}
+	        				}
+						}
+	    				
 	    			    ind = 0;
 	    			    for(i = 0 ; i < neurones.size() ; i ++) {
 	    				ind = ind + ages.get(i).size();

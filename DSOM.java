@@ -76,7 +76,19 @@ public class DSOM extends NeuralNetwork {
 			int i, k, l;
 		
 			exemples = 0;
-			while (exemples < epochs) {
+			while (exemples < epochs && visuel.getGoOn()) {
+				
+				synchronized (visuel) {
+					while(visuel.getPause()){
+						try {
+							visuel.wait();
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+    				}
+				}
+				
 			    System.out.printf(" DSom \t %5d sur %5d \r", exemples, epochs); 
 			    exemples ++;
 		
