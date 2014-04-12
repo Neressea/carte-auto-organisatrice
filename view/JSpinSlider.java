@@ -1,25 +1,139 @@
 package view;
 
-import java.awt.GridLayout;
-
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JSpinner;
-
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+/**
+ * A customized component that holds a spinner and a slider.
+ * It deals with a min, a max and a step.
+ * 
+ * @author valbert
+ *
+ */
 
 @SuppressWarnings("serial")
 public class JSpinSlider extends JPanel{
-	private JSlider slider;
-	private JSpinner spin;
+	private JDoubleSpin spin;
+	private JColorSlider slider;
+	private Double minimum, maximum, value;
 	
-	public JSpinSlider(int max, int min, int step){
+	public JSpinSlider(int width, int height, Double min, Double max, Double v, Double step){
 		super();
 		
-		slider = new JSlider();
-		spin = new JSpinner();
+		minimum = min;
+		maximum = max;
+		value = v;
 		
-		this.setLayout(new GridLayout(2, 1));
-		this.add(slider);
-		this.add(spin);
+		//We begin by creating a customized JSpinner that accept just integers.
+		spin = new JDoubleSpin((int)(width*0.3), height,min, max, value, step);
+		slider = new JColorSlider((int)(width*0.7), height, value/max);
+		
+		setLayout(new BorderLayout());
+		
+		this.add(slider, BorderLayout.WEST);
+		this.add(spin, BorderLayout.EAST);
+		
+		activate();
+		
+		setPreferredSize(new Dimension(width, height));
+	}
+	
+	public JSpinSlider(Double min, Double max, Double value, Double step){
+		this(300, 50, min, max, value, step);
+	}
+	
+	public Double getValue(){
+		return value;
+	}
+	
+	public void activate(){
+		//We add listeners
+		slider.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				//We convert the graphical value into the real value
+				/*
+				 * We use this formula : value = position * gap / width
+				 * for normalization
+				 */
+				Double gap = maximum - minimum; //The interval between min and max
+				Double conversion=new Double(arg0.getX())*gap/new Double(slider.getWidth());
+				
+				setValue(conversion);
+			}
+		});
+		
+		slider.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent arg0) {
+				//We convert the graphical value into the real value
+				/*
+				 * We use this formula : value = position * gap / width
+				 * for normalization
+				 */
+				Double gap = maximum-minimum; //The interval between min and max
+				Double conversion=new Double(arg0.getX())*gap/(new Double(slider.getWidth()));
+				
+				if(arg0.getX() >= 0 && arg0.getX() <= slider.getWidth())
+					setValue(conversion);
+			}
+		});
+		
+		spin.getModel().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+
+				setValue((Double)spin.getModel().getValue());
+			}
+		});
+	}
+	
+	/**
+	 * Set the new value, or ignore it if it doesn't respect bounds
+	 * @param v The value
+	 */
+	public void setValue(Double v){
+		if(v.compareTo(minimum)>=0 && v.compareTo(maximum)<=0)
+			value = v;
+		else if(v.compareTo(minimum)<=0)
+			value = minimum;
+		else if(v.compareTo(maximum)>=0)
+			value = maximum;
+		repaint();
+	}
+	
+	@Override
+	public void paintComponent(Graphics g){
+		
+		//We convert real the value into graphical coordinates
+		/*
+		 * We use this formula : position = value / gap * width
+		 * for normalization
+		 */
+		Double gap = maximum-minimum; //The interval between min and max
+		Double conversion = value/gap*new Double(slider.getWidth());
+		slider.setValue(conversion);
+
+		spin.setValue(value);
+		
+		spin.repaint();
+		slider.repaint();
+	}
+	
+	public void setColor(Color c){
+		slider.setColor(c);
+		repaint();
+	}
+	
+	public Color getColor(){
+		return slider.getColor();
 	}
 }
+

@@ -14,6 +14,9 @@ public class Options {
 	
 	private int nb_data; //number of data
 	private double elasticity;
+	private double elasticity_min;
+	private double elasticity_max;
+	private double elasticity_step;
     private int rows, cols;
     private int nb_neuronsDep;
     private int nb_epochs;
@@ -35,6 +38,9 @@ public class Options {
     private Options(){
     	nb_data = 100000;
     	elasticity = 2.5;
+    	elasticity_min = 0.05;
+    	elasticity_max = 0.5;
+    	elasticity_step = 0.1;
     	rows = 10;
     	cols = 10;
     	nb_neuronsDep = 2;
@@ -46,6 +52,30 @@ public class Options {
     	stopped = true;
     	paused = false;
     	refresh = 50;
+    }
+    
+    public double getElasticityMin(){
+    	return elasticity_min;
+    }
+    
+    public void setElasticityMin(double min){
+    	elasticity_min = min;
+    }
+    
+    public double getElasticityMax(){
+    	return elasticity_max;
+    }
+    
+    public void setElasticityMax(double max){
+    	elasticity_max = max;
+    }
+    
+    public double getElasticityStep(){
+    	return elasticity_step;
+    }
+    
+    public void setElasticityStep(double step){
+    	elasticity_step = step;
     }
     
     public int getRefresh(){

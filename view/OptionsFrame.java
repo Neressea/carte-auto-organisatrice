@@ -1,10 +1,9 @@
 package view;
 
-import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.util.Hashtable;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -34,7 +33,7 @@ public class OptionsFrame extends JFrame{
 		private JCheckBox choice_neighbor;
 		
 	/*--- Options for DSOM ---*/
-		//private JSlider slider_elasticity;
+		private JSpinSliderWrapper wrapper_elasticity;
 		
 	/*--- Options for GNG ---*/
 		private JSlider slider_nb_dep;
@@ -47,27 +46,37 @@ public class OptionsFrame extends JFrame{
 		field_nb_data = new JFormattedTextField(new Integer(Options.getOptions().getNbData()));
 		field_nb_epochs = new JFormattedTextField(new Integer(Options.getOptions().getNbEpochs()));
 		
-		slider_width = new JSlider(1, 10);
-		slider_height = new JSlider(1, 10);
+		slider_width = getIntSlider(1, 10, 1);
+		slider_height = getIntSlider(1, 10, 1);
 		
 		choice_learning = new JCheckBox();
 		choice_neighbor = new JCheckBox();
 		
-		slider_nb_dep = new JSlider(2, 10);
+		wrapper_elasticity = new JSpinSliderWrapper(400, 80);
 		
+		slider_nb_dep = getIntSlider(2, 10, 1);
+			
 		//We add them listeners
 		addListeners();
 		
-		//We add thm to the frame
+		//We will add components later with switcher()
 		container = new JPanel();
 		
-		//We create a layout able to contain all componenents of the frame (so we don't count the container)
-		container.setLayout(new GridLayout(getClass().getDeclaredFields().length - 1, 1, 30, 15));
-		
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
+	}
+	
+	public JSlider getIntSlider(int begin, int end, int step){
+		JSlider slider = new JSlider(begin, end);
 		
-		setContentPane(container);
-		pack();
+		Hashtable<Integer, JLabel> table = new Hashtable<Integer, JLabel>();
+		for(int i=begin; i<=end; i++) table.put(i, new JLabel(i+""));
+		
+		slider.setLabelTable(table);
+		slider.setMinorTickSpacing(1);
+		slider.setPaintTicks(true);
+		slider.setPaintLabels(true);
+		
+		return slider;
 	}
 	
 	/**
@@ -89,12 +98,11 @@ public class OptionsFrame extends JFrame{
 			slider_nb_dep.setEnabled(false);
 			
 		}else{
-			//In other case we enabled all components
+			//In other case we enable all components
 			for(int i=0; i<container.getComponentCount(); i++){
 				container.getComponent(i).setEnabled(true);
 			}
 		}
-		
 	}
 	
 	/**
@@ -102,7 +110,9 @@ public class OptionsFrame extends JFrame{
 	 * @param s Name of the network (get with its toString())
 	 */
 	public void switcher(String s){
-		container.removeAll();
+		container = new JPanel();
+		//We set 0 to have an infinite possibility of rows
+		container.setLayout(new GridLayout(0, 2, 30, 30)); 
 		setAbstractNetworkFrame();
 		
 		switch(s){
@@ -119,7 +129,9 @@ public class OptionsFrame extends JFrame{
 			break;
 		}
 		
+		setContentPane(container);
 		pack();
+		disable(false);
 	}
 	
 	public void setAbstractNetworkFrame(){
@@ -155,7 +167,8 @@ public class OptionsFrame extends JFrame{
 		
 		setTitle("Options - DSOM");
 		
-		//TODO : SpinSlider
+		wrapper_elasticity = new JSpinSliderWrapper(300, 80);
+		add("Elasticity : ", wrapper_elasticity);
 	}
 	
 	public void setGNGFrame(){
@@ -164,7 +177,6 @@ public class OptionsFrame extends JFrame{
 		add("Number of neurons : ", slider_nb_dep);
 		
 		setTitle("Options - GNG");
-		
 	}
 	
 	public void add(String label, JComponent component){
