@@ -49,7 +49,6 @@ public class ButtonsPanel extends JPanel{
 	
 	public void change(boolean current_state){
 			btn_clear.setEnabled(!current_state);
-			btn_options.setEnabled(!current_state);
 			btn_launch.setEnabled(!current_state);
 			btn_stop.setEnabled(current_state);
 			btn_pause.setEnabled(current_state);
@@ -102,6 +101,16 @@ public class ButtonsPanel extends JPanel{
 			}
 		});
 		
+		btn_step.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Options.getOptions().setStep(true);
+				synchronized (world) {
+					world.notifyAll();
+				}
+			}
+		});
+		
 		btn_launch.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -113,6 +122,7 @@ public class ButtonsPanel extends JPanel{
 				
 				//We fill the network
 				n.fill();
+				world.clear();
 				world.setNet(n);
 				
 				//If there is no data, we reset them

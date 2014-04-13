@@ -80,6 +80,13 @@ public class GNG extends AbstractNetwork {
 				while(Options.getOptions().getPaused() && !Options.getOptions().getStopped()){
 					try {
 						holder.wait();
+						
+						if(Options.getOptions().getStepped()){
+							
+							//If we "step", we go out for one round
+							Options.getOptions().setStep(false);
+							break;
+						}
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
@@ -273,9 +280,16 @@ public class GNG extends AbstractNetwork {
 				ages.get(num2).set(ind, 0);
 
 		    } //nv Neuron
+		    
+		    //We wait a little because it's too fast in other cases
+		    try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	
-		    if ((exemples % refresh) ==0)
-		    	holder.change();
+		    holder.change();
 		}
 		
 		Options.getOptions().setStopped(true);

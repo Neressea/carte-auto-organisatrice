@@ -78,29 +78,21 @@ class JDoubleSpin extends JSpinner{
 			model = model.concat("#");
 		
 		//Then we compute the number of decimals that there can be
-		String s_step = step.toString();
-		String[] split_step = s_step.split("\\.");
+		int p_min = getPrecision(min);
+		int p_max = getPrecision(max);
+		int p_step = getPrecision(step);
 		
-		String s_min = min.toString();
-		String[] split_min = s_min.split("\\.");
-		
-		//We watch what has the more decimals
-		int [] nb_decs = new int[3];
-		
-		if(split_max.length>1)
-			nb_decs[0] = split_max[1].length();
-		
-		if(split_step.length>1)
-			nb_decs[1] = split_step[1].length();
-		
-		if(split_min.length>1)
-			nb_decs[2] = split_min[1].length();
-		
+		//We watch which has the more decimals
 		int nb_dec=0;
-		for (int i = 0; i < nb_decs.length; i++) {
-			if(nb_decs[i]>nb_dec)
-				nb_dec = nb_decs[i];
-		}
+
+		if(p_min>nb_dec)
+			nb_dec = p_min;
+		
+		if(p_max>nb_dec)
+			nb_dec = p_max;
+		
+		if(p_step>nb_dec)
+			nb_dec = p_step;
 		
 		//We verify that there are decimals
 		if(nb_dec>0){
@@ -110,8 +102,31 @@ class JDoubleSpin extends JSpinner{
 				model = model.concat("#");
 		}
 		
-		System.out.println(model);
-		
 		return model;
+	}
+	
+	private int getPrecision(Double v){
+		int p=0;
+		
+		String s_v = v.toString();
+		
+		/*We check the representation of the double
+		 * (0.005 or 1.0E-5)
+		 */
+		if(s_v.contains("E")){
+			
+			String[] split_v = s_v.split("E");
+			p = -(new Integer(split_v[1]));
+			
+		}else{
+			
+			String[] split_v = s_v.split("\\.");
+			
+			if(split_v.length > 1)
+				p = split_v[1].length();
+			
+		}
+		
+		return p;
 	}
 }

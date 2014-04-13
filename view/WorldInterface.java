@@ -27,7 +27,7 @@ public class WorldInterface extends JFrame implements Observer{
 		options = new OptionsFrame();
 		
 		//We create all necessary objects
-		draw = new NetworkDraw(500);
+		draw = new NetworkDraw(550);
 		draw.getWorld().addObserver(this);
 		
 		ArrayList<String> names_data = new ArrayList<String>();

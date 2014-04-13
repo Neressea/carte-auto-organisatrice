@@ -23,6 +23,7 @@ public class JSpinSlider extends JPanel{
 	private JDoubleSpin spin;
 	private JColorSlider slider;
 	private Double minimum, maximum, value;
+	private ChangeListener listener;
 	
 	public JSpinSlider(int width, int height, Double min, Double max, Double v, Double step){
 		super();
@@ -95,6 +96,10 @@ public class JSpinSlider extends JPanel{
 		});
 	}
 	
+	public void addChangeListener(ChangeListener cl){
+		listener = cl;
+	}
+	
 	/**
 	 * Set the new value, or ignore it if it doesn't respect bounds
 	 * @param v The value
@@ -107,6 +112,8 @@ public class JSpinSlider extends JPanel{
 		else if(v.compareTo(maximum)>=0)
 			value = maximum;
 		repaint();
+		
+		listener.stateChanged(new ChangeEvent(this));
 	}
 	
 	@Override

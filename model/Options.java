@@ -13,7 +13,6 @@ public class Options {
 	private static Options OPTIONS = new Options();
 	
 	private int nb_data; //number of data
-	private double elasticity;
 	private double elasticity_min;
 	private double elasticity_max;
 	private double elasticity_step;
@@ -29,6 +28,9 @@ public class Options {
     //Volatile for threads
     private volatile boolean stopped;
     private volatile boolean paused;
+    private volatile boolean stepped;
+    private volatile double elasticity; //We can change value of elasticity during a thread
+    private volatile double epsilon;
     
     //A static method to access the singleton
     public static Options getOptions(){
@@ -39,8 +41,9 @@ public class Options {
     	nb_data = 100000;
     	elasticity = 2.5;
     	elasticity_min = 0.05;
-    	elasticity_max = 0.5;
-    	elasticity_step = 0.1;
+    	elasticity_max = 5;
+    	elasticity_step = 0.01;
+    	epsilon = 0.5;
     	rows = 10;
     	cols = 10;
     	nb_neuronsDep = 2;
@@ -51,7 +54,24 @@ public class Options {
     	learning_const = false;
     	stopped = true;
     	paused = false;
+    	stepped = false;
     	refresh = 50;
+    }
+    
+    public double getEpsilon(){
+    	return epsilon;
+    }
+    
+    public void setEpsilon(double e){
+    	epsilon = e;
+    }
+    
+    public boolean getStepped(){
+    	return stepped;
+    }
+    
+    public void setStep(boolean s){
+    	stepped = s;
     }
     
     public double getElasticityMin(){

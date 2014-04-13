@@ -52,7 +52,7 @@ public class OptionsFrame extends JFrame{
 		choice_learning = new JCheckBox();
 		choice_neighbor = new JCheckBox();
 		
-		wrapper_elasticity = new JSpinSliderWrapper(400, 80);
+		wrapper_elasticity = new JSpinSliderWrapper(500, 50);
 		
 		slider_nb_dep = getIntSlider(2, 10, 1);
 			
@@ -167,7 +167,6 @@ public class OptionsFrame extends JFrame{
 		
 		setTitle("Options - DSOM");
 		
-		wrapper_elasticity = new JSpinSliderWrapper(300, 80);
 		add("Elasticity : ", wrapper_elasticity);
 	}
 	
@@ -234,6 +233,13 @@ public class OptionsFrame extends JFrame{
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				o.setNbDep(slider_nb_dep.getValue());
+			}
+		});
+		
+		wrapper_elasticity.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				Options.getOptions().setElasticity(((JSpinSlider)e.getSource()).getValue());
 			}
 		});
 	}

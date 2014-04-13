@@ -60,6 +60,13 @@ public class SOM extends AbstractMap {
 				while(Options.getOptions().getPaused() && !Options.getOptions().getStopped()){
 					try {
 						holder.wait();
+						
+						if(Options.getOptions().getStepped()){
+							
+							//If we "step", we go out for one round
+							Options.getOptions().setStep(false);
+							break;
+						}
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
@@ -127,9 +134,15 @@ public class SOM extends AbstractMap {
 				}
 		    }	
 		    
-		    if ((exemples % refresh) ==0)
-		    	holder.change();
+		  //We wait a little because it's too fast in other cases
+		    try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		    
+		    holder.change();
 		    exemples++;
 		}
 		
@@ -143,11 +156,10 @@ public class SOM extends AbstractMap {
 		double dCol;
 		double dRow;
 		
-		
 		dCol = Math.pow(((double) current_best.getCol() - (double) n2.getCol())/colNumber,2);
 		dRow = Math.pow(((double) current_best.getRow() - (double) n2.getRow())/rowNumber,2);
 	
-		return Math.sqrt(dCol + dRow);	
+		return Math.sqrt(dCol + dRow);
     }
 
     public void setContinu(int continu, int totalEpochs) {

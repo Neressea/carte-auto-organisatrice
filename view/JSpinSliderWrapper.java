@@ -13,6 +13,8 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import model.Options;
 
@@ -22,6 +24,7 @@ public class JSpinSliderWrapper extends JPanel{
 	private int width, height;
 	private JSpinSlider spin_slider;
 	private JButton go;
+	private ChangeListener listener;
 	
 	public JSpinSliderWrapper(int w, int h){	
 		
@@ -37,7 +40,7 @@ public class JSpinSliderWrapper extends JPanel{
 		spin_slider = new JSpinSlider(width, (int)(height*0.6), ela_min,ela_max, ela_val, ela_step);
 		
 		NumberFormat nf = NumberFormat.getInstance();
-		nf.setMaximumFractionDigits(5);
+		nf.setMaximumFractionDigits(10);
 		nf.setMaximumIntegerDigits(1);
 		nf.setMinimumFractionDigits(1);
 		nf.setMinimumIntegerDigits(1);
@@ -50,7 +53,7 @@ public class JSpinSliderWrapper extends JPanel{
 		field_max.setValue(new Double(o.getElasticityMax()));
 		field_step.setValue(new Double(o.getElasticityStep()));
 		
-		go = new JButton("Go");
+		go = new JButton("Set");
 		
 		setPreferredSize(new Dimension(width, height));
 		
@@ -68,6 +71,11 @@ public class JSpinSliderWrapper extends JPanel{
 				}
 			}
 		});
+	}
+	
+	public void addChangeListener(ChangeListener cl){
+		listener = cl;
+		spin_slider.addChangeListener(cl);
 	}
 	
 	/**
@@ -118,8 +126,7 @@ public class JSpinSliderWrapper extends JPanel{
 		else
 			step = new Double((Long)field_step.getValue());
 		
-		
-		
+
 		remove(spin_slider);
 		
 		//We verify if we can reuse former value or if we have to set a new one
@@ -127,6 +134,13 @@ public class JSpinSliderWrapper extends JPanel{
 			spin_slider = new JSpinSlider(width, (int)(height*0.6), min, max, value, step);
 		else
 			spin_slider = new JSpinSlider(width, (int)(height*0.6), min, max, (max-min)/(new Double(2)), step);
+		
+		spin_slider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				spin_slider.addChangeListener(listener);
+			}
+		});
 		
 		add(spin_slider, BorderLayout.SOUTH);
 		revalidate();

@@ -2,11 +2,8 @@ package model;
 
 public class DSOM extends AbstractMap {
 
-    private double elasticity;
-    
     public DSOM (Environment h) {
 		super(h);
-		elasticity = Options.getOptions().getElasticity();
     }
     
     @Override
@@ -46,6 +43,13 @@ public class DSOM extends AbstractMap {
 				while(Options.getOptions().getPaused() && !Options.getOptions().getStopped()){
 					try {
 						holder.wait();
+						
+						if(Options.getOptions().getStepped()){
+							
+							//If we "step", we go out for one round
+							Options.getOptions().setStep(false);
+							break;
+						}
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -83,7 +87,7 @@ public class DSOM extends AbstractMap {
 				    int Numcible   =  cible.getRow() * colNumber + cible.getCol();
 				    distance_topo  =     distancesTopo[Numcible][NumCurrentBest]/(colNumber + rowNumber);
 				    
-				    neighb = Math.exp(-1* Math.pow(distance_topo, 2)/Math.pow(elasticity, 2)/db);
+				    neighb = Math.exp(-1* Math.pow(distance_topo, 2)/Math.pow(Options.getOptions().getElasticity(), 2)/db);
 				    System.out.println("Dist topo : "+distance_topo);
 				    System.out.println("DB Carré : "+db );
 				    // Mise a jour des poids
@@ -95,13 +99,22 @@ public class DSOM extends AbstractMap {
     					dl = Data.getData().get(index).getPoids().get(l);
     					delta = Math.abs(wl - dl) * neighb * (dl - wl);
     					System.out.print("\t w"+l+"  " + wl + "("+ delta +")" + " d"+l+"  " + dl);
-    					wl = wl + delta;
+    					wl += Options.getOptions().getEpsilon()*delta;
     					cible.getPoids().set(l, new Float(wl));		
 				    }
 				}
-			    }	
-		    if ((exemples % refresh) ==0)
-		    	holder.change();
+			  
+		    }	
+		    
+		    //We wait a little because it's too fast in other cases
+		    try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
+		    holder.change();
 		}
 		
 		Options.getOptions().setStopped(true);

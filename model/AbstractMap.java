@@ -13,7 +13,17 @@ public abstract class AbstractMap extends AbstractNetwork {
 		rowNumber = Options.getOptions().getNbRows();
 		
 		// Memorisation des distances topologiques
-		distancesTopo = new double [colNumber*rowNumber][colNumber*rowNumber];	
+		distancesTopo = new double [colNumber*rowNumber][colNumber*rowNumber];        
+        int normalisation = (colNumber+rowNumber-2);
+        for (int i=0;i<neurons.size();i++) {
+            for (int j=0 ;j<neurons.get(i).size();j++) {
+                for(int k = 0 ; k < neurons.size() ; k ++) {
+                    for(int l = 0 ; l <neurons.get(k).size(); l++) {                
+                        distancesTopo[i*rowNumber +j][k*rowNumber +l] = distance_voisins(neurons.get(i).get(j), neurons.get(k).get(l))/ normalisation;
+                    }
+                }
+            }
+        }
 	}
     
     public abstract double distance_voisins(Neuron currentBest,Neuron n);
