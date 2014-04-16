@@ -29,6 +29,25 @@ public abstract class AbstractMap extends BasicNetwork {
     public abstract double distance_voisins(Neuron currentBest,Neuron n);
     public abstract boolean getAleatory();
     
+    public Neuron getNearest(int index_data){
+    	double distance;
+    	
+    	Neuron near = neurons.get(0).get(0);
+    	double distance_best = near.distance(Data.getData().get(index_data));
+    	
+    	for(int i=0;i<neurons.size();i++) {
+			for(int k=0;k<neurons.get(i).size();k++) {
+			    distance = neurons.get(i).get(k).distance(Data.getData().get(index_data));
+			    if(distance < distance_best) {
+			    	distance_best = distance;
+			    	near = neurons.get(i).get(k);
+			    }
+			}
+	    }
+    	
+    	return near;
+    }
+    
     @Override
 	public void fill() {
     	nb_neurons = rowNumber * colNumber;

@@ -11,12 +11,10 @@ public class SOM extends AbstractMap {
     double lrate_i =   0.5;
     double lrate_f = 0.005;
     
-    private int continu; // permet les donnees dynamiques
     private int totalEpochs;
 
     public SOM (Environment h) {
 		super(h);
-		this.continu     = 0;
 		this.totalEpochs = 1;
     }
     
@@ -33,16 +31,7 @@ public class SOM extends AbstractMap {
     @Override
 	public void learn() {
     	
-		int index;
-		double t;
 		double lrate, sigma;
-	
-		int i, k;
-		Neuron current_best;
-		double distance_best;
-		double distance;
-		double distance_v;
-		double distance_w;
 		
 		nb_neurons = colNumber*rowNumber;
 	
@@ -62,66 +51,51 @@ public class SOM extends AbstractMap {
 			//We verify the pause
 			checkPause();
 			
-			//We pritn the state 
+			//We print the state 
 			printState(new Object[]{exemples, epochs, lrate, lrate_i, lrate_f, sigma, sigma_i, sigma_f});
 			
-		    // Mise a jour des voisinages et tx apprentissage
-		    t = ((continu * epochs)+exemples) / (float)(totalEpochs * epochs);
+		    //We update the learning rate
+		    double t = ((Options.getOptions().getContinuous() * epochs)+exemples) / (float)(totalEpochs * epochs);
 
 		    if (decrease_lrate)
 		    	lrate = lrate_i*Math.pow((lrate_f/lrate_i), Math.pow(t, 1.2));
 		    if (decrease_sigma)
 		    	sigma = sigma_i*Math.pow((sigma_f/sigma_i), Math.pow(t, 1.2));
 		    
-		     
+		    //We pick up a piece of data
+		    int index_data = (int) (Math.random()*Data.getData().size());
 		    
-		    // Tirage de l'exemple courant
-		    index = (int) (Math.random()*Data.getData().size());
+		    //We search for the nearest neuron
+		    Neuron current_best = getNearest(index_data);
 		    
-		    // Recherche du neurone le plus proche
-		    current_best = neurons.get(0).get(0);
-		    distance_best = current_best.distance(Data.getData().get(index));
+		    int num_nearest_topo = current_best.getRow() * colNumber + current_best.getCol();
 		    
-		    for(i=0;i<neurons.size();i++) {
-				for(k=0;k<neurons.get(i).size();k++) {
-				    distance = neurons.get(i).get(k).distance(Data.getData().get(index));
-				    if(distance < distance_best) {
-    					distance_best = distance;
-    					current_best = neurons.get(i).get(k);
-				    }
-				}
-		    }
-		    
-		    int NumCurrentBest = current_best.getRow() * colNumber + current_best.getCol();
-		    
-		    for(i = 0 ; i < neurons.size() ; i++){
-				for(k = 0 ; k < neurons.get(i).size() ; k++){
+		    //We update all weights 
+		    for(int i = 0 ; i < neurons.size() ; i++){
+				for(int k = 0 ; k < neurons.get(i).size() ; k++){
 
 				    Neuron cible = neurons.get(i).get(k);
 				    int Numcible =  cible.getRow() * colNumber + cible.getCol();
 				    
-				    //On distingue deux cas : si le voisinage est constant ou non
-				    double e = 0;
-				    double h = 0;
+				    //We verify if learning rate and neighborhood are fixed or not
+				    double learning_rate = 0;
+				    double neighborhood = 0;
 				    
 				    if(Options.getOptions().getNeighborhoodCst()){
-				    	h = Options.getOptions().getNeighborhoodSom();
+				    	neighborhood = Options.getOptions().getNeighborhoodSom();
 				    }else{
-				    	distance_w = distancesTopo[Numcible][NumCurrentBest];
-				    	
-    				    // Influence du voisinage
-    				    distance_v = Math.exp(-1.0*distance_w/sigma);
-    				    h = distance_v;				   
+				    	double distance_w = distancesTopo[Numcible][num_nearest_topo];
+    				    neighborhood = Math.exp(-1.0*distance_w/sigma);				   
 				    }
 				    
 				    if(Options.getOptions().getLearningCst()){
-				    	e = Options.getOptions().getLearningSom();
+				    	learning_rate = Options.getOptions().getLearningSom();
 				    }else{
-				    	e = lrate;
+				    	learning_rate = lrate;
 				    }
 				    
-				    // Mise a jour des poids du neurone
-				    cible.setPoids(e, h, Data.getData().get(index));
+				    //Update
+				    cible.setPoids(learning_rate, neighborhood, Data.getData().get(index_data));
 				}
 		    }	
 		    
@@ -161,7 +135,7 @@ public class SOM extends AbstractMap {
     }
 
     public void setContinu(int continu, int totalEpochs) {
-		this.continu     =     continu;
+    	Options.getOptions().setContinuous(continu);
 		this.totalEpochs = totalEpochs;
     }
     

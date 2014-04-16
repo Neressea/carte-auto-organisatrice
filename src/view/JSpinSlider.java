@@ -83,11 +83,11 @@ public class JSpinSlider extends JPanel{
 			public void mouseClicked(MouseEvent arg0) {
 				//We convert the graphical value into the real value
 				/*
-				 * We use this formula : value = position * gap / width
-				 * for normalization
+				 * We use this formula for normalization : 
+				 * value = (position/width)*gap + min
 				 */
 				Double gap = maximum - minimum; //The interval between min and max
-				Double conversion=new Double(arg0.getX())*gap/new Double(slider.getWidth());
+				Double conversion=(new Double((double)arg0.getX()/slider.getWidth()))*gap+minimum;
 				
 				setValue(conversion);
 			}
@@ -96,14 +96,16 @@ public class JSpinSlider extends JPanel{
 		slider.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent arg0) {
+				
 				//We convert the graphical value into the real value
 				/*
-				 * We use this formula : value = position * gap / width
-				 * for normalization
+				 * We use this formula for normalization : 
+				 * value = (position/width)*gap + min
 				 */
 				Double gap = maximum-minimum; //The interval between min and max
-				Double conversion=new Double(arg0.getX())*gap/(new Double(slider.getWidth()));
+				Double conversion=(new Double((double)arg0.getX()/slider.getWidth()))*gap+minimum;
 				
+				//We verify that we are always in the component
 				if(arg0.getX() >= 0 && arg0.getX() <= slider.getWidth())
 					setValue(conversion);
 			}
@@ -141,13 +143,16 @@ public class JSpinSlider extends JPanel{
 		
 		//We convert real the value into graphical coordinates
 		/*
-		 * We use this formula : position = value / gap * width
-		 * for normalization
+		 * We use this formula for normalization : 
+		 * position = width * percentage
+		 * 
+		 * where percentage = (value - min)/(max - min)
 		 */
 		Double gap = maximum-minimum; //The interval between min and max
-		Double conversion = value/gap*new Double(slider.getWidth());
+		Double percentage = new Double((value-minimum)/gap);
+		Double conversion = new Double(slider.getWidth())*percentage;
+		
 		slider.setValue(conversion);
-
 		spin.setValue(value);
 		
 		spin.repaint();

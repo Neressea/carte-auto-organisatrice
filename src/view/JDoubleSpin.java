@@ -102,6 +102,8 @@ class JDoubleSpin extends JSpinner{
 				model = model.concat("#");
 		}
 		
+		System.out.println(model);
+		
 		return model;
 	}
 	

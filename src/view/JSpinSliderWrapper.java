@@ -112,7 +112,8 @@ public class JSpinSliderWrapper extends JPanel{
 		Double step = null;
 		Double value = spin_slider.getValue();
 		
-		/*	We are obliged to verify the instance returned by each field: 
+		/*	
+		 * We are obliged to verify the instance returned by each field: 
 		 * 	If we put 2 or 3.0 in the field, it returns a Long and not a Double
 		 */
 		if(field_min.getValue() instanceof Double)
@@ -174,7 +175,8 @@ public class JSpinSliderWrapper extends JPanel{
 		Double max=null;
 		Double step=null;
 		
-		/*	We are obliged to verify the instance returned by each field: 
+		/*	
+		 * We are obliged to verify the instance returned by each field: 
 		 * 	If we put 2 or 3.0 in the field, it returns a Long and not a Double
 		 */
 		if(field_min.getValue() instanceof Double)

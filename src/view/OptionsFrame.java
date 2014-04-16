@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.util.Hashtable;
 
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
@@ -28,6 +27,7 @@ public class OptionsFrame extends JFrame{
 	/*--- Options for AbstractNetwork ---*/
 		private JFormattedTextField field_nb_data;
 		private JFormattedTextField field_nb_epochs;
+		private JFormattedTextField field_time_to_wait;
 		
 	/*--- Options for AbstractMap (SOM, DSOM) ---*/
 		private JSlider slider_width;
@@ -38,6 +38,7 @@ public class OptionsFrame extends JFrame{
 		private JCheckBox choice_neighbor;
 		private JSpinSliderWrapper wrapper_neighborhood_som;
 		private JSpinSliderWrapper wrapper_learning_som;
+		private JCheckBox choice_continuous;
 		
 	/*--- Options for DSOM ---*/
 		private JSpinSliderWrapper wrapper_elasticity;
@@ -60,12 +61,15 @@ public class OptionsFrame extends JFrame{
 		//We initialize all attributes
 		field_nb_data = new JFormattedTextField(new Integer(Options.getOptions().getNbData()));
 		field_nb_epochs = new JFormattedTextField(new Integer(Options.getOptions().getNbEpochs()));
+		field_time_to_wait = new JFormattedTextField(new Integer(Options.getOptions().getTimeToWait()));
 		
 		slider_width = getIntSlider(1, 10, 1);
 		slider_height = getIntSlider(1, 10, 1);
 		
 		choice_learning = new JCheckBox();
 		choice_neighbor = new JCheckBox();
+		
+		choice_continuous = new JCheckBox();
 		
 		Options o = Options.getOptions();
 		Double ela_min, ela_max, ela_step, ela_val;
@@ -219,6 +223,7 @@ public class OptionsFrame extends JFrame{
 		
 		add("Number of data : ", field_nb_data);
 		add("Number of epochs : ", field_nb_epochs);
+		add("Time to wait (for the speed) : ", field_time_to_wait);
 	}
 	
 	public void setAbstractMapFrame(){
@@ -232,8 +237,11 @@ public class OptionsFrame extends JFrame{
 	public void setSOMFrame(){
 		setAbstractMapFrame();
 		
+		choice_continuous.setSelected(Options.getOptions().getContinuous() == 1);
 		choice_learning.setSelected(Options.getOptions().getLearningCst());
 		choice_neighbor.setSelected(Options.getOptions().getNeighborhoodCst());
+		
+		add("Continuous : ", choice_continuous);
 		
 		//We add the two checkboxes on the same line
 		String[] labels = {"Constant learning : \t", "Constant neighborhood : "};
@@ -241,7 +249,7 @@ public class OptionsFrame extends JFrame{
 		add(labels, boxes);
 
 		add("Learning :           ", wrapper_learning_som);
-		add("Neighborhood : ", wrapper_neighborhood_som);;
+		add("Neighborhood : ", wrapper_neighborhood_som);
 		
 		setTitle("Options - SOM");
 	}
@@ -323,6 +331,13 @@ public class OptionsFrame extends JFrame{
 			}
 		});
 		
+		field_time_to_wait.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				o.setTimeToWait((int) field_time_to_wait.getValue());
+			}
+		});
+		
 		slider_width.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
@@ -334,6 +349,18 @@ public class OptionsFrame extends JFrame{
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				o.setNbRows(slider_height.getValue());
+			}
+		});
+		
+		choice_continuous.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if(choice_continuous.isSelected())
+					o.setContinuous(1);
+				else
+					o.setContinuous(0);
+
 			}
 		});
 		

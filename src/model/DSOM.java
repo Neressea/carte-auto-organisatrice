@@ -20,85 +20,6 @@ public class DSOM extends AbstractMap {
     public boolean getAleatory(){
     	return false;
     }
-
-    @Override
-    public void learn(){
-    	int          exemples;
-		int    NumCurrentBest;
-		double  distance_best;
-		double       distance;
-		double  distance_topo;
-		double         neighb;
-		Neuron  current_best;
-		int             index;
-		int i, k, l;
-		
-		nb_neurons = colNumber*rowNumber;
-		exemples = 0;
-		
-		while (exemples < epochs && !Options.getOptions().getStopped()) {
-			
-			//We verify the pause
-			checkPause();
-			
-			//We print the state
-			printState(new Object[]{exemples, epochs, Options.getOptions().getElasticity(), Options.getOptions().getEpsilon()});
-			 
-		    exemples ++;
-	
-		    // Tirage de l'exemple courant
-		    index = (int) (Math.random()*Data.getData().size());
-		    
-		    // Recherche du Neuron le plus proche
-		    current_best = neurons.get(0).get(0);
-		    distance_best = current_best.distance(Data.getData().get(index));
-		    
-		    for(i=0;i<neurons.size();i++) {
-				for(k=0;k<neurons.get(i).size();k++) {
-				    distance = neurons.get(i).get(k).distance(Data.getData().get(index));
-				    if(distance < distance_best) {
-				    	distance_best = distance;
-				    	current_best = neurons.get(i).get(k);
-				    }
-				}
-		    }
-		     
-		    NumCurrentBest = current_best.getRow() * colNumber + current_best.getCol();
-		    double db = Math.pow(distance_best, 2);
-		    
-		    // Mise a jour des poids de tous les neurons
-		    for(i = 0 ; i < neurons.size() ; i++) {
-				for(k=0;k<neurons.get(i).size();k++) {
-				    Neuron cible  =                      neurons.get(i).get(k);
-				    int Numcible   =  cible.getRow() * colNumber + cible.getCol();
-				    distance_topo  =     distancesTopo[Numcible][NumCurrentBest]/(colNumber + rowNumber);
-				    
-				    neighb = Math.exp(-1* Math.pow(distance_topo, 2)/Math.pow(Options.getOptions().getElasticity(), 2)/db);
-				    
-				    // Mise a jour des poids
-				    double wl, dl; 		    
-				    double delta;
-				    
-				    for(l = 0; l < cible.getPoids().size() ; l++) {
-    					wl = cible.getPoids().get(l);
-    					dl = Data.getData().get(index).getPoids().get(l);
-    					delta = Math.abs(wl - dl) * neighb * (dl - wl);
-    					
-    					wl += Options.getOptions().getEpsilon()*delta;
-    					cible.getPoids().set(l, new Float(wl));		
-				    }
-				}
-			  
-		    }	
-		    
-		    //We wait a little because it's too fast in other cases
-		    sleep();
-		    
-		    world.change();
-		}
-		
-		world.change();
-    }
     
     @Override
     public String printState(Object[] to_print){
@@ -112,5 +33,81 @@ public class DSOM extends AbstractMap {
     	System.out.println(s);
     	
     	return s;
+    }
+    
+    @Override
+    public void learn(){
+		
+		nb_neurons = colNumber*rowNumber;
+		int examples = 0;
+		
+		while (examples < epochs && !Options.getOptions().getStopped()) {
+			
+			//We verify the pause
+			checkPause();
+			
+			//We print the state
+			printState(new Object[]{examples, epochs, Options.getOptions().getElasticity(), Options.getOptions().getEpsilon()});
+			 
+			examples++;
+	
+		    //We pick up a piece of data
+		    int index_data = (int) (Math.random()*Data.getData().size());
+		    
+		    //We get the neuron which is the nearest to this data
+		    Neuron current_best = getNearest(index_data);
+		    
+		    //We compute the distance between this neuron and the data
+		    double distance_best = current_best.distance(Data.getData().get(index_data));
+		    
+		    //And we get the number of the column in the topological distances' array
+		    int num_best = current_best.getRow() * colNumber + current_best.getCol();
+		    
+		    //We update the weights of all neurons
+		    for(int i = 0 ; i < neurons.size() ; i++) {
+				for(int k=0;k<neurons.get(i).size();k++) {
+					
+					//We get the current neuron...
+				    Neuron target  = neurons.get(i).get(k);
+				    
+				    //... and we get its topological distance to the nearest
+				    int num_target_topo =  target.getRow() * colNumber + target.getCol();
+				    
+				    //We compute the topological distance between the two neurons
+				    double distance_topo = distancesTopo[num_target_topo][num_best]/(colNumber + rowNumber);
+				    
+				    //We compute the neighborhood
+				    double neighb = Math.exp(-1* Math.pow(distance_topo, 2)/Math.pow(Options.getOptions().getElasticity(), 2)/Math.pow(distance_best, 2));
+				    
+				    //We update the weight of the target    				    
+				    for(int l = 0; l < target.getPoids().size() ; l++) {
+				    	
+				    	//We get the current weight
+    					double current_weight = target.getPoids().get(l);
+    					
+    					//We get the weight of the data
+    					double data_weight = Data.getData().get(index_data).getPoids().get(l);
+    					
+    					//We compute the variations 
+    					double delta = Math.abs(current_weight - data_weight) * neighb * (data_weight - current_weight);
+    					
+    					//We change the value of the weight
+    					current_weight += Options.getOptions().getEpsilon()*delta;
+    					
+    					//We set the new weight
+    					target.getPoids().set(l, new Float(current_weight));
+    					
+				    }
+				}
+			  
+		    }	
+		    
+		    //We wait a little because it's too fast in other cases
+		    sleep();
+		    
+		    world.change();
+		}
+		
+		world.change();
     }
 }

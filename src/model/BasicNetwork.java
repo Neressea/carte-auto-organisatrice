@@ -37,7 +37,7 @@ public abstract class BasicNetwork extends AbstractNetwork{
 	
 	public void sleep(){
 		try {
-			Thread.sleep(1);
+			Thread.sleep(Options.getOptions().getTimeToWait());
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

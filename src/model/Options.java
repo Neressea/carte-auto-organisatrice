@@ -33,6 +33,8 @@ public class Options {
     private volatile double epsilon;
     private volatile double neighborhood_gng;
     private volatile double winner_gng;
+    private volatile int time_to_wait;
+    private volatile int continuous;
     
     //A static method to access the singleton
     public static Options getOptions(){
@@ -41,7 +43,7 @@ public class Options {
     
     private Options(){
     	nb_data = 100000;
-    	elasticity = 2.5;
+    	elasticity = 0.65;
     	epsilon = 0.5;
     	rows = 10;
     	cols = 10;
@@ -60,9 +62,27 @@ public class Options {
         time_new = 300;
         neighborhood_gng = 0.00006;
         winner_gng = 0.05;
+        time_to_wait = 1;
+        continuous = 0;
     }
     
-    public double getWinnerDistGng(){
+    public int getContinuous() {
+		return continuous;
+	}
+
+	public void setContinuous(int continuous) {
+		this.continuous = continuous;
+	}
+
+	public int getTimeToWait() {
+		return time_to_wait;
+	}
+
+	public void setTimeToWait(int time_to_wait) {
+		this.time_to_wait = time_to_wait;
+	}
+
+	public double getWinnerDistGng(){
     	return winner_gng;
     }
     
